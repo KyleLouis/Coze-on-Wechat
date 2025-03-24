@@ -1,6 +1,11 @@
 import streamlit as st
 import json
 import os
+from utils.auth import check_password, logout
+
+# 检查登录状态
+if not check_password():
+    st.stop()
 
 # 添加自定义CSS样式，与home.py保持一致
 st.markdown("""
@@ -153,6 +158,10 @@ try:
         # 添加刷新按钮
         if st.button("🔄 刷新页面", key="refresh_button"):
             st.rerun()
+            
+        # 添加退出登录按钮
+        if st.button("🚪 退出登录", type="secondary", key="logout_button"):
+            logout()
         
     with col2:
         st.markdown("### 📝 机器人配置")

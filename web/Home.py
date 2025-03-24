@@ -6,12 +6,17 @@ import time
 import json
 import shutil
 from PIL import Image
+from utils.auth import check_password, logout
 
 # 使用绝对路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 icon_path = os.path.join(project_root, "docs", "ico.ico")
 app_path = os.path.join(project_root, "app.py")
+
+# 检查登录状态
+if not check_password():
+    st.stop()
 
 if os.path.exists(icon_path):
     icon = Image.open(icon_path)
@@ -238,6 +243,10 @@ with col1:
     # 添加刷新按钮
     if st.button("🔄 刷新页面", key="refresh_button"):
         st.rerun()
+        
+    # 添加退出登录按钮
+    if st.button("🚪 退出登录", type="secondary", key="logout_button"):
+        logout()
 
 with col2:
     # 日志显示区域

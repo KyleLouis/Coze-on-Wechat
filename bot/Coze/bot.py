@@ -43,6 +43,11 @@ class CozeBot(Bot):
             if not conversation_id:
                 if not (conversation_id := self.conv_manager.create_conversation(user_id)):
                     return Reply(ReplyType.TEXT, "会话创建失败")
+            
+            # 确保会话可用
+            conversation_id = self.conv_manager.ensure_conversation(conversation_id, user_id)
+            if not conversation_id:
+                return Reply(ReplyType.TEXT, "会话状态异常，请稍后重试")
 
             # 创建消息并获取回复
             return self._create_message_and_get_reply(conversation_id, query, context)
@@ -85,7 +90,7 @@ class CozeBot(Bot):
 
     def _create_message_and_get_reply(self, conversation_id, query, context):
         """创建消息并获取回复"""
-        try:
+        def create_and_poll():
             message = self.coze_client.conversations.messages.create(
                 conversation_id=conversation_id,
                 content=query,
@@ -94,13 +99,28 @@ class CozeBot(Bot):
             )
             logger.debug(f"消息已创建: {message.id}")
 
-            chat = self.coze_client.chat.create_and_poll(
+            return self.coze_client.chat.create_and_poll(
                 conversation_id=conversation_id,
                 bot_id=self.bot_id,
                 user_id=context["receiver"],
                 additional_messages=[message],
                 auto_save_history=True
             )
+
+        try:
+            # 使用重试机制执行消息创建和轮询
+            chat = self.conv_manager.retry_with_new_conversation(create_and_poll)
+            if not chat:
+                # 如果重试失败，创建新会话并重试
+                new_conversation_id = self.conv_manager.create_conversation(context["session_id"])
+                if not new_conversation_id:
+                    return Reply(ReplyType.TEXT, "创建新会话失败")
+                
+                # 更新会话ID并重试
+                conversation_id = new_conversation_id
+                chat = self.conv_manager.retry_with_new_conversation(create_and_poll)
+                if not chat:
+                    return Reply(ReplyType.TEXT, "消息处理失败，请稍后重试")
 
             replies = []
             for messages in chat.messages:

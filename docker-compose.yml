@@ -9,7 +9,8 @@ services:
       - "8501:8501"
     volumes:
       - ./config.json:/app/config.json
-
+    environment:
+      - TZ=Asia/Shanghai  # 可选：部分镜像需同时设置环境变量
     depends_on:
       - gewechat
     networks:
@@ -24,6 +25,8 @@ services:
       - "2532:2532"
     volumes:
       - ./gewechat/data:/root/temp
+    environment:
+      - TZ=Asia/Shanghai  # 可选：部分镜像需同时设置环境变量
     networks:
       - coze-network
 
