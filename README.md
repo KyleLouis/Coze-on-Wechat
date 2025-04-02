@@ -7,6 +7,9 @@
 如果我的项目对您有帮助，请点一个 star 吧~
 </div>
 
+
+### 项目的初衷是基于Coze构建个人微信智能助手，项目本身并不支持商业需求，同时也不接待任何商业需求，仅作个人智能助手使用，谢谢!
+
 ---
 
 ## 📋 功能概览
@@ -179,8 +182,7 @@ docker-compose up -d
 [![Star History Chart](https://api.star-history.com/svg?repos=JC0v0/Coze-on-Wechat&type=Date)](https://star-history.com/#JC0v0/Coze-on-Wechat&Date)
 
 
-<div align="center"> <div style="display: flex; justify-content: center; gap: 50px;"> <div> <h4>联系我</h4> <img src="https://github.com/user-attachments/assets/d61764ec-c975-4b34-96c3-96bef668d67a" width="150"> </div>
+<div align="center"> <div style="display: flex; justify-content: center; gap: 50px;"> <div> <h4>加我进群请备注：Coze-on-Wechat  进群请留言：进群</h4> <img src="https://github.com/user-attachments/assets/d61764ec-c975-4b34-96c3-96bef668d67a" width="150"> </div>
   
-<div> <h4>交流群</h4> <img src="https://github.com/user-attachments/assets/32ade468-a053-45b9-bedc-5de85707d478" width="150"> </div> </div>
 
 </div> 

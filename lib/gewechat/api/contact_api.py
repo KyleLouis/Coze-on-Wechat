@@ -41,10 +41,10 @@ class ContactApi:
         param = {
             "appId": app_id,
             "scene": scene,
-            "option": option,
-            "v3": v3,
+            "content": content,
             "v4": v4,
-            "content": content
+            "v3": v3,
+            "option": option,
         }
         return post_json(self.base_url, "/contacts/addContacts", self.token, param)
 

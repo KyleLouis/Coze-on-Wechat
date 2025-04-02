@@ -458,12 +458,38 @@ class FileHandler:
             logger.error(f"[gewechat] Failed to download voice file: {e}")
             return False
 
+def Friend_request_message(msg_data):
+        """处理好友请求消息"""
+
+        content_str = msg_data['Data']['Content']['string']
+        
+        try:
+            # 检查内容是否包含XML格式的消息
+            if "<msg " in content_str:
+                # 解析XML消息
+                xml_start = content_str.find("<msg ")
+                xml_content = content_str[xml_start:]
+                root = ET.fromstring(xml_content)
+                
+                v3=root.get("encryptusername", "")
+                nickname=root.get("fromnickname", "")
+                content=root.get("content", "")
+                v4=root.get("ticket", "")
+            logger.info(f"收到{nickname}的好友请求:{content}")
+            return v3,v4,nickname,content
+        except Exception as e:
+            logger.error(f"[gewechat] 好友请求消息处理异常: {e}")
+            return None,None,None,None
+                
+   
+
+
 class GeWeChatMessage(ChatMessage):
     def __init__(self, msg, client: GewechatClient):
         super().__init__(msg)
         self.msg = msg
         self.client = client
-        
+        self.app_id = conf().get("gewechat_app_id")
         # 初始化处理器
         self.base_handler = BaseMessageHandler(msg, client)
         self.file_handler = FileHandler(client, self.base_handler.app_id)
@@ -478,7 +504,7 @@ class GeWeChatMessage(ChatMessage):
         self.is_group = basic_info['is_group']
         self.other_user_id = self.from_user_id
         
-        if not self.msg.get('Data'):
+        if not self.msg.get('Data'or"data"):
             logger.warning("[gewechat] Missing 'Data' in message")
             return
             
@@ -508,7 +534,7 @@ class GeWeChatMessage(ChatMessage):
         elif msg_type == 3:  # 图片消息
             if self.is_group:
                 # 群聊图片不处理
-                logger.info(f"[gewechat] Ignoring image from group chat: {self.from_user_id}")
+                logger.info(f"[gewechat] 忽略群聊中的图像: {self.from_user_id}")
                 self._prepare_fn = None  # 清除准备函数
             else:
                 # 私聊图片处理（保持原有逻辑）
@@ -522,12 +548,19 @@ class GeWeChatMessage(ChatMessage):
             self.ctype = ContextType.STATUS_SYNC
             self.content = self.msg['Data']['Content']['string']
             return
+        
+
+        elif msg_type == 37: # 好友添加请求通知
+            self.ctype=ContextType.ACCEPT_FRIEND
+            self._addContacts()
+            return
             
         elif msg_type == 10002:  # 群系统消息
             self._handle_group_system_message()
         else:
             raise NotImplementedError(f"Unsupported message type: Type:{msg_type}")
-            
+
+ 
         # 获取用户信息
         self._get_user_info()
         
@@ -673,3 +706,22 @@ class GeWeChatMessage(ChatMessage):
             return True
             
         return False
+
+    def _addContacts(self):
+        """处理添加好友"""
+        v3,v4,nickname,content=Friend_request_message(self.msg)
+        if content in conf().get("accept_friend_commands",[]):
+            
+            re=self.client.add_contacts(app_id=self.app_id,
+                                    scene=14,
+                                    content="hallo",
+                                    v4=v4,
+                                    v3=v3,
+                                    option=3
+                                    )
+            if re['ret'] == 200:
+                logger.info(f"成功添加好友{nickname}")
+            else:
+                logger.error(f"添加好友失败{re}")
+
+

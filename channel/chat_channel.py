@@ -231,8 +231,7 @@ class ChatChannel(Channel):
                     "msg": context.get("msg")
                 }
                 reply = super().build_reply_content(context.content, context)
-            elif context.type == ContextType.ACCEPT_FRIEND:  # 好友申请，匹配字符串
-                reply = self._build_friend_request_reply(context)
+
 
             elif context.type == ContextType.SHARING:  # 分享信息，当前无默认逻辑
                 context["channel"] = e_context["channel"]
@@ -326,18 +325,6 @@ class ChatChannel(Channel):
             if retry_cnt < 2:
                 time.sleep(3 + 3 * retry_cnt)
                 self._send(reply, context, retry_cnt + 1)
-
-    # 处理好友申请
-    def _build_friend_request_reply(self, context):
-        if isinstance(context.content, dict) and "Content" in context.content:
-            logger.info("friend request content: {}".format(context.content["Content"]))
-            if context.content["Content"] in conf().get("accept_friend_commands", []):
-                return Reply(type=ReplyType.ACCEPT_FRIEND, content=True)
-            else:
-                return Reply(type=ReplyType.ACCEPT_FRIEND, content=False)
-        else:
-            logger.error("Invalid context content: {}".format(context.content))
-            return None
 
     def _success_callback(self, session_id, **kwargs):  # 线程正常结束时的回调函数
         logger.debug("Worker return success, session_id = {}".format(session_id))

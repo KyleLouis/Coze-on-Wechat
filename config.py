@@ -33,6 +33,8 @@ available_setting = {
     "single_chat_reply_prefix": "[bot] ",  # 私聊时自动回复的前缀，用于区分真人
     "single_chat_reply_suffix": "[机器人]",  # 私聊时自动回复的后缀，\n 可以换行
     "accept_friend_commands": ["加好友"],  # 自动接受好友请求的申请信息
+    "invite_member_commands": ["加群"],  # 自动接受群聊邀请的申请信息
+    "invite_chatroom_id":"",  #邀请进群的群id
     "group_chat_prefix": ["@bot"],  # 群聊时包含该前缀则会触发机器人回复
     "no_need_at": False,  # 群聊回复时是否不需要艾特
     "group_chat_reply_prefix": "",  # 群聊时自动回复的前缀

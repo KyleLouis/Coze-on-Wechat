@@ -4,9 +4,9 @@
             "enabled": true,
             "priority": 999
         },
-        "JinaSum": {
-            "enabled": false,
-            "priority": 10
+        "InviteMember": {
+            "enabled": true,
+            "priority": 999
         },
         "Hello": {
             "enabled": true,
